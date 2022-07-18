@@ -13,14 +13,15 @@ const api = axios.create({
     }
   };
 
- export const getCars = async () => api.get(`/car`,config).then(res=>res)
- //{
-//     // api.get(`/car`,config).then((res) => {
+ export const getCars = async () =>{
+//  => api.get(`/car`,config).then(res=>res)
+ 
+    // api.get(`/car`,config).then((res) => {
 
-//     //     return res;
-//     // }).catch(err=>console.log(err));
-//     return await api.get('/car',config);
-//   };
+    //     return res;
+    // }).catch(err=>console.log(err));
+    return await api.get('/car',config);
+  };
 
 
   export const getCar = async (id:string|CookieValueTypes|undefined) => {
@@ -46,8 +47,9 @@ const api = axios.create({
     return await  api.post('/car', car,config)
   }
 
-  export const putCar=async(car:Car,id:string|CookieValueTypes|undefined)=>{
-    return await api.put(`/car/${id}`,car,config)
+  export const putCar=async(car:Car)=>{
+    const{id:carId}=car;
+    return await api.put(`/car/${carId}`,car,config)
   }
 
   export const deleteCar = async (id:string|CookieValueTypes|undefined) => {

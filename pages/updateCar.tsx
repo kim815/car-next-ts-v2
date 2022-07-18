@@ -6,7 +6,7 @@ import useStore from "../store/useGlobalStore";
 import cookies from "next-cookies";
 import { getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import {dehydrate,QueryClient,useQuery} from 'react-query';
+import {dehydrate,QueryClient,useQuery,useMutation,useQueryClient} from 'react-query';
 import { getCar,putCar } from "../services/services";
 
 
@@ -92,6 +92,16 @@ function UpdateCar(){
       )
       .catch(err=>console.log(err))
     },{staleTime: 30000});
+
+
+    const queryClient=useQueryClient();
+      const{mutate}=useMutation(putCar,{
+        onSuccess:()=>{
+
+          queryClient.invalidateQueries('listCars');
+          console.log('inside onsucess mutate')
+        },
+      });
     // useEffect(() => {
     //     //Runs only on the first render
     //     // console.log(cars.length);
@@ -189,15 +199,16 @@ function handleSubmit(e){
     //     };
         const id=getCookie('updateId')
         // axios.put(`http://localhost:3000/car/${id}`,carNewAxios,config)
-        putCar(carNewAxios,id)
-    .then(response => {
-    //   setCarNewAxios(response.data);
-    console.log(response.data);
+        // putCar(carNewAxios,id)
+        mutate(carNewAxios)
+    // .then(response => {
+    // //   setCarNewAxios(response.data);
+    // console.log(response.data);
 
-    })
-    .catch(err => {
-      console.log(err);
-    })
+    // })
+    // .catch(err => {
+    //   console.log(err);
+    // })
         // navigate('/');
         setShowToastNotif(true);
         router.push('/listCar');

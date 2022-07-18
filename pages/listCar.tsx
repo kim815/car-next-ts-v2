@@ -6,7 +6,7 @@ import {Button,TextInput,Form,Stack,DataTable, TableRow,TableContainer,Table,Tab
 import { getCookie,setCookie } from "cookies-next";
 import cookies from 'next-cookies';
 import { useRouter } from 'next/router';
-import {dehydrate,QueryClient,useQuery} from 'react-query';
+import {dehydrate,QueryClient,useQuery,useMutation, useQueryClient} from 'react-query';
 import { ToastNotification } from 'carbon-components-react';
 import { getCars,deleteCar } from '../services/services';
 
@@ -40,7 +40,17 @@ export async function getServerSideProps(context) {
   //     cars:res.data
   //   }, // will be passed to the page component as props
   // }
-  const queryClient=new QueryClient();
+  const queryClient=new QueryClient({
+    defaultOptions:{
+      queries:{
+
+        refetchOnWindowFocus: true,
+        refetchOnMount:true
+      }
+    }
+  }
+    
+  );
   await queryClient.prefetchQuery('listCars',getCars);
   return{
     props:{
@@ -62,8 +72,14 @@ export async function getServerSideProps(context) {
         .catch(err=>console.log(err))
       },{staleTime: 30000});
       
-      
-      
+      const queryClient=useQueryClient();
+      const{mutate}=useMutation(deleteCar,{
+        onSuccess:()=>{
+
+          queryClient.invalidateQueries('listCars');
+          console.log('inside onsucess mutate')
+        },
+      });
       
       // setCarsList(data?.data);
 
@@ -75,6 +91,7 @@ export async function getServerSideProps(context) {
         
 const [deleteClick,setDeleteClick]=useState(false);
 const router=useRouter();
+
   // useEffect(()=>{
   //   // axios.get('http://localhost:3000/car')
   //   // .then(response => {
@@ -120,12 +137,13 @@ const router=useRouter();
         const id=e.target.value
         
         // axios.delete(`http://localhost:3000/car/${id}`)
-        deleteCar(id)
-    .then(response =>{ 
-      console.log(response.data);
-      setCarsList(response.data);
-      setDeleteClick(true);
-  });
+        // deleteCar(id)
+        mutate(id)
+  //   .then(response =>{ 
+  //     console.log(response.data);
+  //     setCarsList(response.data);
+  //     setDeleteClick(true);
+  // });
     }
     
     function handleEdit(e)
